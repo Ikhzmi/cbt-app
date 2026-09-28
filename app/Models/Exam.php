@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Exam extends Model
+{
+    use SoftDeletes;
+
+    protected $guarded = [];
+
+    protected $casts = [
+        'treshold' => 'decimal:2',
+        'started_at' => 'datetime',
+        'expired_at' => 'datetime',
+        'exact_time' => 'boolean',
+        'is_available' => 'boolean',
+    ];
+
+    // Relasi many-to-many dengan model Subject
+    public function subjects(): BelongsToMany
+    {
+        return $this->belongsToMany(Subject::class)
+            ->withPivot('qty');
+    }
+}
