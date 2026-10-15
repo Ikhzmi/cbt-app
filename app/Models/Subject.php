@@ -21,6 +21,12 @@ class Subject extends Model
         return $this->hasMany(Question::class);
     }
 
+    // relasi 1 to many dengan riwayat ujian per mapel
+    public function examHistories(): HasMany
+    {
+        return $this->hasMany(ExamHistory::class);
+    }
+
     // relasi many to many dengan tabel exams
     // Relasi many-to-many dengan model Subject
     public function exams(): BelongsToMany

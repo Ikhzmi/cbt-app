@@ -1,9 +1,36 @@
 @import 'tailwindcss';
 
+/* Samakan dark mode Tailwind dengan Filament (class .dark di <html>) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+@source '../../vendor/filament/**/*.blade.php';
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* Prevent any unstyled or Filament SVG icon from blowing up anywhere in the app */
+.fi-icon,
+.fi-breadcrumbs-item-separator,
+.fi-page-header-back-button svg,
+.fi-breadcrumbs svg,
+.fi-icon-btn-icon,
+.fi-btn-icon {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    max-width: 1.25rem !important;
+    max-height: 1.25rem !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+}
+
+svg.w-3, svg.h-3 { width: 0.75rem !important; height: 0.75rem !important; max-width: 0.75rem !important; max-height: 0.75rem !important; }
+svg.w-4, svg.h-4 { width: 1rem !important; height: 1rem !important; max-width: 1rem !important; max-height: 1rem !important; }
+svg.w-5, svg.h-5 { width: 1.25rem !important; height: 1.25rem !important; max-width: 1.25rem !important; max-height: 1.25rem !important; }
+svg.w-6, svg.h-6 { width: 1.5rem !important; height: 1.5rem !important; max-width: 1.5rem !important; max-height: 1.5rem !important; }
+svg.w-7, svg.h-7 { width: 1.75rem !important; height: 1.75rem !important; max-width: 1.75rem !important; max-height: 1.75rem !important; }
+svg.w-8, svg.h-8 { width: 2rem !important; height: 2rem !important; max-width: 2rem !important; max-height: 2rem !important; }

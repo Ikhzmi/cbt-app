@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackbox Testing & Analisis Fitur Baru - CBT Application</title>
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+            --primary-light: #e0f2fe;
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --warning: #d97706;
+            --warning-light: #fef3c7;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--gray-800);
+            line-height: 1.5;
+            padding: 24px 16px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff;
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::after {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(2, 132, 199, 0.15);
+            border-radius: 50%;
+            filter: blur(40px);
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge-tag {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            background: #0284c7;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 14px;
+            max-width: 900px;
+        }
+
+        /* Highlights & Bug Logic Alerts */
+        .alert-card {
+            background: #ffffff;
+            border-left: 5px solid var(--warning);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .alert-card.danger {
+            border-left-color: var(--danger);
+        }
+
+        .alert-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .alert-content {
+            font-size: 13.5px;
+            color: var(--gray-700);
+        }
+
+        .alert-content ul {
+            margin-left: 20px;
+            margin-top: 6px;
+        }
+
+        .alert-content li {
+            margin-bottom: 4px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border-radius: var(--radius-md);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray-400);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 6px 0;
+            line-height: 1;
+        }
+
+        .stat-desc {
+            font-size: 12px;
+            color: var(--gray-600);
+        }
+
+        .val-total { color: var(--gray-800); }
+        .val-sesuai { color: var(--success); }
+        .val-tidak { color: var(--danger); }
+        .val-pending { color: var(--warning); }
+
+        /* Progress Bar */
+        .progress-container {
+            background: #ffffff;
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .progress-track {
+            height: 12px;
+            background: var(--gray-200);
+            border-radius: 9999px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .progress-bar-pass {
+            background: var(--success);
+            transition: width 0.3s ease;
+        }
+
+        .progress-bar-fail {
+            background: var(--danger);
+            transition: width 0.3s ease;
+        }
+
+        /* Toolbar / Filters */
+        .toolbar {
+            background: #ffffff;
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toolbar-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            min-width: 260px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 9px 12px 9px 34px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--gray-300);
+            font-size: 13.5px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: var(--gray-400);
+            pointer-events: none;
+        }
+
+        .filter-select {
+            padding: 9px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--gray-300);
+            font-size: 13px;
+            font-weight: 500;
+            background: #ffffff;
+            color: var(--gray-700);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 9px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: var(--primary); color: #ffffff; }
+        .btn-primary:hover { background: var(--primary-hover); }
+
+        .btn-success { background: var(--success); color: #ffffff; }
+        .btn-success:hover { background: #15803d; }
+
+        .btn-outline {
+            background: #ffffff;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+        }
+        .btn-outline:hover { background: var(--gray-100); }
+
+        .btn-danger-outline {
+            background: #ffffff;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+        .btn-danger-outline:hover {
+            background: var(--danger-light);
+        }
+
+        /* Test Table / Accordion */
+        .test-table-container {
+            background: #ffffff;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .table-header-info {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+            background: var(--gray-50);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header-info h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table.test-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        table.test-table th {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            font-weight: 700;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--gray-300);
+            white-space: nowrap;
+        }
+
+        table.test-table td {
+            padding: 14px;
+            border-bottom: 1px solid var(--gray-200);
+            vertical-align: top;
+        }
+
+        table.test-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .tc-id {
+            font-family: monospace;
+            font-weight: 700;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+
+        .tc-module {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--gray-600);
+            background: var(--gray-200);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+        }
+
+        .tc-scenario {
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .tc-steps {
+            color: var(--gray-700);
+            font-size: 12.5px;
+            line-height: 1.4;
+            margin-top: 4px;
+        }
+
+        .tc-steps ol {
+            margin-left: 18px;
+            margin-top: 2px;
+        }
+
+        .tc-expected {
+            color: var(--gray-800);
+            font-size: 12.5px;
+            line-height: 1.4;
+        }
+
+        .tc-data {
+            background: var(--gray-50);
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 11.5px;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-200);
+            margin-top: 4px;
+        }
+
+        /* Result Dropdown styling */
+        .select-status {
+            width: 100%;
+            min-width: 130px;
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 12.5px;
+            cursor: pointer;
+            border: 1.5px solid var(--gray-300);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .select-status.status-pending {
+            background-color: var(--warning-light);
+            color: #92400e;
+            border-color: #f59e0b;
+        }
+
+        .select-status.status-sesuai {
+            background-color: var(--success-light);
+            color: #14532d;
+            border-color: #22c55e;
+        }
+
+        .select-status.status-tidak {
+            background-color: var(--danger-light);
+            color: #7f1d1d;
+            border-color: #ef4444;
+        }
+
+        .notes-textarea {
+            width: 100%;
+            min-width: 180px;
+            height: 60px;
+            padding: 6px 8px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            resize: vertical;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .notes-textarea:focus {
+            border-color: var(--primary);
+        }
+
+        .badge-pill {
+            display: inline-block;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+        }
+
+        .badge-crit { background: #fee2e2; color: #991b1b; }
+        .badge-high { background: #ffedd5; color: #9a3412; }
+        .badge-med { background: #fef9c3; color: #854d0e; }
+        .badge-low { background: #e0f2fe; color: #075985; }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 13px;
+            color: var(--gray-400);
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        /* Header top bar */
+        .header-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .theme-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(8px);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* ======================================================== */
+        /* DARK MODE STYLES                                         */
+        /* ======================================================== */
+        body.dark-mode {
+            background-color: #0b0f19;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .header {
+            background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+            border: 1px solid #1e293b;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+        }
+
+        body.dark-mode .theme-toggle-btn {
+            background: rgba(30, 41, 59, 0.85);
+            border-color: rgba(71, 85, 105, 0.6);
+            color: #f8fafc;
+        }
+
+        body.dark-mode .theme-toggle-btn:hover {
+            background: rgba(51, 65, 85, 0.95);
+        }
+
+        body.dark-mode .alert-card {
+            background: #111827;
+            border-left-color: #f59e0b;
+            border-top: 1px solid #1f2937;
+            border-right: 1px solid #1f2937;
+            border-bottom: 1px solid #1f2937;
+            color: #e5e7eb;
+        }
+
+        body.dark-mode .alert-card.danger {
+            border-left-color: #ef4444;
+        }
+
+        body.dark-mode .alert-title {
+            color: #f9fafb;
+        }
+
+        body.dark-mode .alert-content {
+            color: #cbd5e1;
+        }
+
+        body.dark-mode .stat-card {
+            background: #111827;
+            border-color: #1f2937;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .stat-label {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .val-total {
+            color: #f8fafc;
+        }
+
+        body.dark-mode .stat-desc {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .progress-container {
+            background: #111827;
+            border-color: #1f2937;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .progress-track {
+            background: #1f2937;
+        }
+
+        body.dark-mode .toolbar {
+            background: #111827;
+            border-color: #1f2937;
+        }
+
+        body.dark-mode .search-input {
+            background: #1f2937;
+            border-color: #374151;
+            color: #f3f4f6;
+        }
+
+        body.dark-mode .search-input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+        }
+
+        body.dark-mode .search-icon {
+            color: #9ca3af;
+        }
+
+        body.dark-mode .filter-select {
+            background: #1f2937;
+            border-color: #374151;
+            color: #f3f4f6;
+        }
+
+        body.dark-mode .btn-outline {
+            background: #1f2937;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+
+        body.dark-mode .btn-outline:hover {
+            background: #374151;
+        }
+
+        body.dark-mode .btn-danger-outline {
+            background: #1f2937;
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
+
+        body.dark-mode .btn-danger-outline:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        body.dark-mode .test-table-container {
+            background: #111827;
+            border-color: #1f2937;
+        }
+
+        body.dark-mode .table-header-info {
+            background: #162032;
+            border-bottom-color: #1f2937;
+        }
+
+        body.dark-mode .table-header-info h2 {
+            color: #f9fafb;
+        }
+
+        body.dark-mode table.test-table th {
+            background: #162032;
+            color: #cbd5e1;
+            border-bottom-color: #1f2937;
+        }
+
+        body.dark-mode table.test-table td {
+            border-bottom-color: #1f2937;
+            color: #cbd5e1;
+        }
+
+        body.dark-mode table.test-table tr:hover {
+            background-color: #1a2436;
+        }
+
+        body.dark-mode .tc-id {
+            color: #38bdf8;
+        }
+
+        body.dark-mode .tc-module {
+            background: #1e293b;
+            color: #93c5fd;
+        }
+
+        body.dark-mode .tc-scenario {
+            color: #f8fafc;
+        }
+
+        body.dark-mode .tc-steps {
+            color: #cbd5e1;
+        }
+
+        body.dark-mode .tc-expected {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .tc-data {
+            background: #162032;
+            border-color: #243248;
+            color: #cbd5e1;
+        }
+
+        body.dark-mode .select-status {
+            background: #1f2937;
+            border-color: #374151;
+            color: #f3f4f6;
+        }
+
+        body.dark-mode .select-status.status-pending {
+            background-color: #451a03;
+            color: #fde68a;
+            border-color: #b45309;
+        }
+
+        body.dark-mode .select-status.status-sesuai {
+            background-color: #064e3b;
+            color: #a7f3d0;
+            border-color: #059669;
+        }
+
+        body.dark-mode .select-status.status-tidak {
+            background-color: #450a0a;
+            color: #fecaca;
+            border-color: #b91c1c;
+        }
+
+        body.dark-mode .notes-textarea {
+            background: #162032;
+            border-color: #2d3d57;
+            color: #f3f4f6;
+        }
+
+        body.dark-mode .notes-textarea:focus {
+            border-color: #38bdf8;
+        }
+
+        body.dark-mode .badge-crit { background: #450a0a; color: #fca5a5; }
+        body.dark-mode .badge-high { background: #431407; color: #fdba74; }
+        body.dark-mode .badge-med { background: #422006; color: #fde047; }
+        body.dark-mode .badge-low { background: #0c4a6e; color: #7dd3fc; }
+
+        body.dark-mode .footer {
+            color: #64748b;
+        }
+
+        /* Print styles */
+        @media print {
+            body { background: #fff; padding: 0; }
+            .header { background: #000; color: #fff; box-shadow: none; }
+            .toolbar, .btn, .footer { display: none !important; }
+            .test-table-container { box-shadow: none; border: 1px solid #000; }
+            table.test-table th, table.test-table td { border-bottom: 1px solid #ccc; font-size: 11px; }
+            .notes-textarea { border: none; }
+            .select-status { border: none; appearance: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-top-bar">
+            <span class="badge-tag">CBT App Quality Assurance</span>
+            <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleDarkMode()" title="Klik untuk ganti tema (Terang / Gelap)">
+                <span id="themeToggleIcon">🌙</span>
+                <span id="themeToggleText">Mode Gelap</span>
+            </button>
+        </div>
+        <h1>Lembar Pengujian Blackbox & Analisis Fitur Baru CBT</h1>
+        <p>
+            Dokumen pengujian interaktif untuk memvalidasi fitur tambahan yang baru diimplementasikan (Manajemen Ujian Multi-Mapel, 
+            Autosave & Ragu-ragu, Anti-Cheat Tab Violation, Auto-Submit & Truncated Timer, Riwayat Siswa & Monitoring Nilai Admin).
+            Pilih status <strong>Sesuai</strong> atau <strong>Tidak Sesuai</strong> pada setiap skenario di bawah ini.
+        </p>
+    </div>
+
+    <!-- Alert / Analisis Temuan Bug Logic & Rekomendasi -->
+    <div class="alert-card danger">
+        <div class="alert-title">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            Hasil Analisis Kode & Temuan Logic/Security yang Wajib Diuji:
+        </div>
+        <div class="alert-content">
+            <p>Berdasarkan analisis static source code terhadap kode perubahan terbaru (uncommitted changes), berikut adalah potensi bug logic dan celah keamanan yang perlu divalidasi secara ketat:</p>
+            <ul>
+                <li><strong>1. Parameter Tampering pada Livewire <code>saveAnswer()</code>:</strong> Method <code>saveAnswer($questionId, $answerId)</code> tidak memvalidasi apakah <code>$answerId</code> benar-benar opsi milik <code>$questionId</code>, atau apakah <code>$questionId</code> tersebut ada dalam daftar soal mapel siswa yang sedang aktif. Siswa teknis berpotensi menyuntikkan answer ID benar dari soal lain.</li>
+                <li><strong>2. State Public Livewire Tanpa <code>#[Locked]</code>:</strong> Properti <code>$historyId</code>, <code>$examId</code>, dan <code>$subjectId</code> dapat dimanipulasi via request Livewire jika tidak diberi atribut <code>#[Locked]</code> di Livewire v3.</li>
+                <li><strong>3. Konkurensi Memulai Multi-Mapel:</strong> Jika siswa membuka tab baru atau merefresh URL ke <code>/mulai</code> saat Mapel 1 masih <code>in_progress</code>, tombol Mapel 2 tetap bisa diklik untuk memulai sesi baru. Hal ini mengakibatkan dua sesi berjalan secara paralel.</li>
+                <li><strong>4. Data Soal Aktif Kurang dari Pivot <code>qty</code>:</strong> Jika admin menyetel kuota soal misal 20, namun di bank soal hanya ada 5 soal aktif, sistem hanya menampilkan 5 soal tanpa peringatan kuota tidak terpenuhi. Jika 0 soal, layar menjadi blank putih tanpa tombol selesai.</li>
+                <li><strong>5. False Positive pada Anti-Cheat (Blur Event):</strong> Event <code>blur</code> dapat terpicu jika siswa mengeklik ekstensi browser, popup password manager, atau sistem notifikasi OS (toleransi maksimal 3x sebelum didiskualifikasi).</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Stats Dashboard -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-label">Total Test Cases</span>
+            <div class="stat-value val-total" id="stat-total">50</div>
+            <span class="stat-desc">Skenario pengujian terdaftar</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Sesuai (Pass)</span>
+            <div class="stat-value val-sesuai" id="stat-sesuai">0</div>
+            <span class="stat-desc" id="stat-sesuai-pct">0% dari total</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Tidak Sesuai (Fail / Bug)</span>
+            <div class="stat-value val-tidak" id="stat-tidak">0</div>
+            <span class="stat-desc" id="stat-tidak-pct">0% dari total</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Belum Diuji (Pending)</span>
+            <div class="stat-value val-pending" id="stat-pending">50</div>
+            <span class="stat-desc" id="stat-pending-pct">100% tersisa</span>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-header">
+            <span>Kemajuan Pengujian & Tingkat Kelulusan</span>
+            <span id="progress-text">0 / 50 Selesai Diuji (0%)</span>
+        </div>
+        <div class="progress-track">
+            <div class="progress-bar-pass" id="bar-pass" style="width: 0%"></div>
+            <div class="progress-bar-fail" id="bar-fail" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <!-- Toolbar & Filter -->
+    <div class="toolbar">
+        <div class="toolbar-group">
+            <div class="search-box">
+                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input type="text" id="searchInput" class="search-input" placeholder="Cari skenario, ID, atau kata kunci..." oninput="filterTable()">
+            </div>
+
+            <select id="moduleFilter" class="filter-select" onchange="filterTable()">
+                <option value="ALL">Semua Modul (10 Modul)</option>
+                <option value="MODUL_1">Modul 1: Autentikasi & Profil Siswa</option>
+                <option value="MODUL_2">Modul 2: Periode & Ketersediaan Ujian</option>
+                <option value="MODUL_3">Modul 3: Pemilihan Mapel & Alur Multi-Mapel</option>
+                <option value="MODUL_4">Modul 4: Timer & Time Truncation</option>
+                <option value="MODUL_5">Modul 5: Navigasi, Autosave & Ragu-Ragu</option>
+                <option value="MODUL_6">Modul 6: Anti-Cheat & Deteksi Pelanggaran</option>
+                <option value="MODUL_7">Modul 7: Penilaian & Submisi Otomatis</option>
+                <option value="MODUL_8">Modul 8: Halaman Hasil & Riwayat Siswa</option>
+                <option value="MODUL_9">Modul 9: Monitoring Nilai Guru/Admin</option>
+                <option value="MODUL_10">Modul 10: Keamanan & Edge Cases</option>
+            </select>
+
+            <select id="statusFilter" class="filter-select" onchange="filterTable()">
+                <option value="ALL">Semua Status Hasil</option>
+                <option value="sesuai">Hanya Sesuai</option>
+                <option value="tidak">Hanya Tidak Sesuai</option>
+                <option value="pending">Hanya Belum Diuji</option>
+            </select>
+        </div>
+
+        <div class="toolbar-group">
+            <button class="btn btn-outline" id="toolbarThemeBtn" onclick="toggleDarkMode()" title="Ganti Mode Terang / Gelap">
+                <span id="toolbarThemeIcon">🌙</span>
+                <span id="toolbarThemeText">Mode Gelap</span>
+            </button>
+            <button class="btn btn-success" onclick="markAllPass()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Semua Sesuai
+            </button>
+            <button class="btn btn-outline" onclick="exportData()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Ekspor JSON
+            </button>
+            <button class="btn btn-outline" onclick="window.print()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                Cetak Laporan
+            </button>
+            <button class="btn btn-danger-outline" onclick="resetAll()">
+                Reset
+            </button>
+        </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="test-table-container">
+        <div class="table-header-info">
+            <h2>Daftar Detail Skenario Blackbox Testing</h2>
+            <span style="font-size: 12px; color: var(--gray-600);">Auto-save aktif (LocalStorage)</span>
+        </div>
+        <div class="table-responsive">
+            <table class="test-table" id="testTable">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">ID & Modul</th>
+                        <th style="width: 250px;">Skenario & Pre-Kondisi</th>
+                        <th style="width: 320px;">Langkah Pengujian & Test Data</th>
+                        <th style="width: 300px;">Hasil yang Diharapkan</th>
+                        <th style="width: 140px;">Hasil Uji</th>
+                        <th style="width: 220px;">Catatan / Temuan Bug</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Rows will be injected by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">
+        CBT Application - Automated Quality Assurance Suite &copy; 2026. File ini dapat dibuka langsung di Google Chrome, Microsoft Edge, atau browser lainnya.
+    </div>
+</div>
+
+<script>
+// Test Cases Data Source
+const testCases = [
+    // --- MODUL 1: AUTENTIKASI & PROFIL SISWA ---
+    {
+        id: "TC-001",
+        module: "MODUL_1",
+        moduleName: "Autentikasi & Profil",
+        severity: "HIGH",
+        scenario: "Proteksi otorisasi halaman ujian terhadap non-siswa",
+        precondition: "User login sebagai Admin atau Guru (bukan akun berelasi siswa).",
+        steps: "1. Buka URL /ujian/exams/{exam}/mulai secara langsung.\n2. Periksa respon sistem dan pengalihan.",
+        testData: "Exam ID = Aktif, User role = 'admin' / 'teacher'.",
+        expected: "Sistem menolak akses, menampilkan Filament Notification 'Akun bukan siswa' (danger), dan mengalihkan ke halaman daftar ujian."
+    },
+    {
+        id: "TC-002",
+        module: "MODUL_1",
+        moduleName: "Autentikasi & Profil",
+        severity: "MEDIUM",
+        scenario: "Field NIS dan Nama Siswa terkunci (Readonly) di StudentProfile",
+        precondition: "Siswa login dan mengakses menu 'Profil & Password' (/ujian/profile).",
+        steps: "1. Akses halaman Profil Siswa.\n2. Coba klik dan edit input NIS dan Nama Lengkap.\n3. Coba submit form profil.",
+        testData: "Username (NIS) = '102938', Name = 'Ahmad Fajar'.",
+        expected: "Input NIS dan Nama berstatus disabled/dehydrated(false). Nilai tidak dapat diubah dan tidak terkirim saat form disubmit."
+    },
+    {
+        id: "TC-003",
+        module: "MODUL_1",
+        moduleName: "Autentikasi & Profil",
+        severity: "HIGH",
+        scenario: "Validasi Ganti Password dengan Password Saat Ini yang Salah",
+        precondition: "Siswa berada di form Ganti Kata Sandi.",
+        steps: "1. Masukkan password lama yang sengaja disalahkan.\n2. Masukkan password baru valid (>= 8 karakter) dan konfirmasi.\n3. Klik simpan.",
+        testData: "Current Password = 'passwordsalah', New Password = 'passwordBaru123'.",
+        expected: "Sistem menolak perubahan password dengan pesan validasi 'Password saat ini tidak cocok'."
+    },
+    {
+        id: "TC-004",
+        module: "MODUL_1",
+        moduleName: "Autentikasi & Profil",
+        severity: "MEDIUM",
+        scenario: "Validasi Password Baru Kurang dari 8 Karakter / Mismatch",
+        precondition: "Siswa mengisi password lama dengan benar.",
+        steps: "1. Masukkan password lama benar.\n2. Masukkan password baru < 8 karakter atau konfirmasi yang tidak cocok.\n3. Klik simpan.",
+        testData: "Current Password = valid, New Password = 'abc', Confirm = 'xyz'.",
+        expected: "Muncul error validasi minimal 8 karakter dan konfirmasi password harus cocok."
+    },
+    {
+        id: "TC-005",
+        module: "MODUL_1",
+        moduleName: "Autentikasi & Profil",
+        severity: "LOW",
+        scenario: "Widget Keamanan Akun dan Dashboard Siswa",
+        precondition: "Siswa membuka dashboard panel ujian (/ujian).",
+        steps: "1. Periksa tampilan widget 'Keamanan Akun' dan tombol 'Ganti Password'.\n2. Klik tombol 'Ganti Password'.",
+        testData: "User = Siswa terautentikasi.",
+        expected: "Widget ter-render rapi dan saat diklik mengarahkan pengguna secara presisi ke URL /ujian/profile."
+    },
+    {
+        id: "TC-006",
+        module: "MODUL_1",
+        moduleName: "Autentikasi & Profil",
+        severity: "HIGH",
+        scenario: "Akurasi Perhitungan Widget StudentStatsOverview",
+        precondition: "Siswa telah menyelesaikan 2 mapel ujian (1 lulus skor 80, 1 gagal skor 40).",
+        steps: "1. Buka dashboard siswa (/ujian).\n2. Amati angka Ujian Tersedia, Ujian Telah Selesai, Jumlah Lulus, dan Rata-rata Nilai.",
+        testData: "Selesai = 2, Lulus = 1, Rata-rata = (80+40)/2 = 60.0.",
+        expected: "Widget menampilkan: Selesai = 2, '1 Ujian Dinyatakan Lulus', Rata-rata Nilai = 60.0 dengan warna badge kuning/warning."
+    },
+
+    // --- MODUL 2: PERIODE & KETERSEDIAAN UJIAN ---
+    {
+        id: "TC-007",
+        module: "MODUL_2",
+        moduleName: "Periode & Ketersediaan",
+        severity: "HIGH",
+        scenario: "Ujian dinonaktifkan admin (is_available = false)",
+        precondition: "Admin mengubah status ujian menjadi non-aktif.",
+        steps: "1. Siswa melihat tabel daftar ujian di /ujian/exams.\n2. Siswa mencoba akses langsung URL /ujian/exams/{id}/mulai.",
+        testData: "Exam ID = 5, is_available = false.",
+        expected: "Ujian tidak muncul di tabel (scopeOpenForStudents). Akses langsung memunculkan notifikasi danger 'Ujian Tidak Tersedia' dan redirect ke index."
+    },
+    {
+        id: "TC-008",
+        module: "MODUL_2",
+        moduleName: "Periode & Ketersediaan",
+        severity: "HIGH",
+        scenario: "Ujian belum mencapai waktu mulai (started_at di masa depan)",
+        precondition: "started_at diatur 2 jam ke depan dari waktu sekarang.",
+        steps: "1. Buka tabel ujian di panel siswa.\n2. Cek status tombol 'Pilih Mapel & Mulai'.\n3. Coba akses via URL langsung.",
+        testData: "started_at = now() + 2 hours.",
+        expected: "Tombol pada tabel ter-disable. Akses URL langsung menampilkan notifikasi warning 'Ujian Belum Dimulai' disertai tanggal/jam buka."
+    },
+    {
+        id: "TC-009",
+        module: "MODUL_2",
+        moduleName: "Periode & Ketersediaan",
+        severity: "HIGH",
+        scenario: "Ujian telah melewati batas waktu (expired_at di masa lalu)",
+        precondition: "expired_at diatur kemarin atau waktu lampau.",
+        steps: "1. Cek tabel ujian di panel siswa.\n2. Buka halaman /ujian/exams/{id}/mulai jika siswa punya riwayat lama.",
+        testData: "expired_at = now() - 1 hour.",
+        expected: "Ujian tidak muncul pada daftar pengerjaan baru. Pada halaman mulai mapel, muncul badge 'Periode ujian telah berakhir — mapel baru tidak dapat dimulai'."
+    },
+    {
+        id: "TC-010",
+        module: "MODUL_2",
+        moduleName: "Periode & Ketersediaan",
+        severity: "MEDIUM",
+        scenario: "Ujian dengan exact_time = true tanpa batas akhir",
+        precondition: "exact_time = true, expired_at = null, started_at <= now().",
+        steps: "1. Siswa memulai ujian.\n2. Amati apakah ujian dibuka berdasarkan durasi per mapel.",
+        testData: "duration = 60 menit.",
+        expected: "Exam::isOpenForNewAttempts() mengembalikan true. Batas pengerjaan murni ditegakkan 60 menit sejak siswa menekan tombol mulai."
+    },
+
+    // --- MODUL 3: PEMILIHAN MAPEL & ALUR MULTI-MAPEL ---
+    {
+        id: "TC-011",
+        module: "MODUL_3",
+        moduleName: "Pemilihan Mapel",
+        severity: "HIGH",
+        scenario: "Tampilan Daftar Mata Pelajaran pada Tahap 1",
+        precondition: "Ujian memiliki 3 mapel relasi dengan pivot qty masing-masing > 0.",
+        steps: "1. Akses halaman /ujian/exams/{id}/mulai.\n2. Amati daftar kartu mata pelajaran yang ditampilkan.",
+        testData: "Mapel: Matematika (25 soal), IPA (20 soal), B. Indo (30 soal).",
+        expected: "Semua 3 mapel muncul dalam kartu grid, memuat info jumlah soal, KKM, durasi, dan tombol aksi yang relevan."
+    },
+    {
+        id: "TC-012",
+        module: "MODUL_3",
+        moduleName: "Pemilihan Mapel",
+        severity: "MEDIUM",
+        scenario: "Penyaringan Mapel dengan Kuota Soal Nol (qty = 0)",
+        precondition: "Mapel X dikaitkan ke ujian tapi pivot qty = 0.",
+        steps: "1. Buka halaman pemilihan mapel.\n2. Cek apakah Mapel X tertampil.",
+        testData: "pivot qty = 0.",
+        expected: "Mapel dengan qty <= 0 otomatis diabaikan dari daftar kartu mapel dan tidak dapat dipilih siswa."
+    },
+    {
+        id: "TC-013",
+        module: "MODUL_3",
+        moduleName: "Pemilihan Mapel",
+        severity: "HIGH",
+        scenario: "Inisialisasi Sesi Ujian Baru Mapel Pertama",
+        precondition: "Siswa belum pernah mengerjakan Mapel Matematika.",
+        steps: "1. Klik tombol 'Mulai Matematika'.\n2. Periksa perubahan tampilan dan data di tabel exam_histories.",
+        testData: "subject_id = 1, qty = 25.",
+        expected: "Tercatat record baru di exam_histories dengan status 'in_progress', record di exam_history_answers sejumlah 25 soal, dan halaman masuk ke Tahap 2 (Lembar Soal)."
+    },
+    {
+        id: "TC-014",
+        module: "MODUL_3",
+        moduleName: "Pemilihan Mapel",
+        severity: "HIGH",
+        scenario: "Kebijakan 1x Pengerjaan per Mapel (Aturan One-Attempt)",
+        precondition: "Siswa telah menyelesaikan Mapel Matematika (status completed).",
+        steps: "1. Buka kembali halaman pemilihan mapel ujian.\n2. Amati kartu Mapel Matematika.\n3. Coba panggil method wire:chooseSubject(1) via console.",
+        testData: "status = 'completed'.",
+        expected: "Tombol utama bertuliskan 'Sudah Selesai' (disabled), ada tombol 'Lihat di Riwayat'. Pemanggilan paksa memunculkan warning 'Mapel sudah selesai'."
+    },
+    {
+        id: "TC-015",
+        module: "MODUL_3",
+        moduleName: "Pemilihan Mapel",
+        severity: "HIGH",
+        scenario: "Melanjutkan Sesi Mapel yang Sedang Berjalan (Resume Session)",
+        precondition: "Siswa memiliki sesi Mapel IPA dengan status 'in_progress'.",
+        steps: "1. Masuk ke halaman pemilihan mapel.\n2. Amati kartu Mapel IPA (badge 'Sedang dikerjakan').\n3. Klik tombol 'Lanjutkan Mengerjakan'.",
+        testData: "status = 'in_progress', waktu mulai 10 menit lalu.",
+        expected: "Siswa langsung diarahkan ke lembar soal, sisa timer melanjutkan waktu tersisa (bukan reset ke awal), dan jawaban sebelumnya tetap terpilih."
+    },
+    {
+        id: "TC-016",
+        module: "MODUL_3",
+        moduleName: "Pemilihan Mapel",
+        severity: "HIGH",
+        scenario: "Blokir Mulai Mapel Baru saat Periode Ujian Telah Tutup",
+        precondition: "expired_at telah lewat, siswa belum mengerjakan Mapel IPA.",
+        steps: "1. Klik tombol pada kartu Mapel IPA yang bertuliskan 'Periode Berakhir'.",
+        testData: "expired_at < now().",
+        expected: "Tombol disabled. Jika dipanggil method-nya, muncul notifikasi warning 'Periode Ujian Telah Berakhir — Mapel baru sudah tidak dapat dimulai'."
+    },
+    {
+        id: "TC-017",
+        module: "MODUL_3",
+        moduleName: "Pemilihan Mapel",
+        severity: "MEDIUM",
+        scenario: "Penanganan Deep-Link Subject ID Tidak Valid",
+        precondition: "Akses URL ujian dengan query parameter tidak sah.",
+        steps: "1. Buka /ujian/exams/{id}/mulai?subject=9999999.",
+        testData: "subject = 9999999 (tidak ada di database).",
+        expected: "Sistem menangkap ketidaksesuaian, memunculkan notifikasi danger 'Mata pelajaran tidak valid', dan tetap berada di daftar mapel."
+    },
+
+    // --- MODUL 4: TIMER & TIME TRUNCATION ---
+    {
+        id: "TC-018",
+        module: "MODUL_4",
+        moduleName: "Timer & Truncation",
+        severity: "HIGH",
+        scenario: "Akurasi Countdown Timer Pengerjaan Ujian",
+        precondition: "Durasi ujian 60 menit, dimulai tepat waktu.",
+        steps: "1. Perhatikan tampilan timer sticky di atas lembar ujian.\n2. Amati countdown per detik selama 15 detik.",
+        testData: "Durasi = 60 menit (01:00:00).",
+        expected: "Format timer HH:MM:SS berjalan stabil mundur setiap detik diselaraskan dengan timestamp deadline server (targetEndTimestamp)."
+    },
+    {
+        id: "TC-019",
+        module: "MODUL_4",
+        moduleName: "Timer & Truncation",
+        severity: "LOW",
+        scenario: "Dinamika Warna Timer (Normal vs Warning vs Urgent)",
+        precondition: "Timer bergerak mendekati batas akhir.",
+        steps: "1. Uji kondisi sisa waktu > 10 menit.\n2. Uji kondisi sisa waktu antara 5 - 10 menit.\n3. Uji kondisi sisa waktu <= 5 menit.",
+        testData: "Sisa: 25 menit, 8 menit, 3 menit.",
+        expected: "Warna badge berubah: Abu/Netral (>10 mnt), Kuning/Amber (<=10 mnt), Merah/Rose (<=5 mnt) secara otomatis via Alpine.js."
+    },
+    {
+        id: "TC-020",
+        module: "MODUL_4",
+        moduleName: "Timer & Truncation",
+        severity: "CRITICAL",
+        scenario: "Pemotongan Durasi Otomatis (Time Truncation) Mendekati Batas Akhir",
+        precondition: "Durasi mapel 60 menit, tapi expired_at ujian tinggal 15 menit lagi.",
+        steps: "1. Siswa memulai pengerjaan mapel.\n2. Amati durasi timer dan banner peringatan.",
+        testData: "expired_at = now() + 15 minutes, exam duration = 60 minutes.",
+        expected: "Timer diset menjadi 15 menit (bukan 60 menit). Muncul banner peringatan kuning: 'Durasi asli ujian adalah 60 menit, namun karena Anda mulai mendekati batas waktu... sisa waktu Anda disesuaikan menjadi ±15 menit'."
+    },
+    {
+        id: "TC-021",
+        module: "MODUL_4",
+        moduleName: "Timer & Truncation",
+        severity: "CRITICAL",
+        scenario: "Submisi Otomatis saat Countdown Timer 00:00:00 (Client Auto-Submit)",
+        precondition: "Siswa sedang mengerjakan soal hingga waktu habis.",
+        steps: "1. Biarkan timer mencapai 00:00:00 (atau percepat clock).\n2. Amati apakah sistem otomatis memanggil submitExam(true).",
+        testData: "diff <= 0 ms.",
+        expected: "hasAutoSubmitted menjadi true, memanggil wire:submitExam(true) tanpa butuh konfirmasi modal, dan beralih ke halaman hasil dengan status 'timeout_auto_submit'."
+    },
+    {
+        id: "TC-022",
+        module: "MODUL_4",
+        moduleName: "Timer & Truncation",
+        severity: "CRITICAL",
+        scenario: "Pembersihan Sesi Expired di Server (Server-Side Auto-Submit on Mount)",
+        precondition: "Siswa menutup browser saat status in_progress lalu ditinggal hingga deadline terlampaui.",
+        steps: "1. Siswa membuka kembali halaman ujian atau daftar ujian (/ujian/exams).\n2. Periksa status sesi di database.",
+        testData: "started_at = 3 jam lalu, durasi = 60 menit.",
+        expected: "ExamHistory::autoSubmitExpiredForStudent() mendeteksi sesi lewat waktu, otomatis memfinalisasi dengan status 'timeout_auto_submit' dan notifikasi muncul memberitahukan sesi kedaluwarsa telah dinilai."
+    },
+
+    // --- MODUL 5: NAVIGASI, AUTOSAVE & RAGU-RAGU ---
+    {
+        id: "TC-023",
+        module: "MODUL_5",
+        moduleName: "Navigasi & Lembar Soal",
+        severity: "HIGH",
+        scenario: "Render Konten Soal HTML Payload & Pilihan Jawaban",
+        precondition: "Soal berisi teks berformat HTML (tebal, list, gambar).",
+        steps: "1. Periksa tampilan butir soal pada kartu tengah.\n2. Periksa tombol opsi pilihan ganda A, B, C, D, dst.",
+        testData: "payload = '<p>Berapakah hasil <strong>5 + 5</strong>?</p>'.",
+        expected: "HTML dirender dengan aman ({!! $payload !!}), huruf abjad tergenerate dinamis (A-Z), dan susunan jawaban teracak jika disetel acak."
+    },
+    {
+        id: "TC-024",
+        module: "MODUL_5",
+        moduleName: "Navigasi & Lembar Soal",
+        severity: "MEDIUM",
+        scenario: "Navigasi Antar Soal (Sebelumnya / Selanjutnya / Klik Palet)",
+        precondition: "Total soal 10 butir, posisi di soal nomor 1.",
+        steps: "1. Tombol 'Sebelumnya' harus disabled di nomor 1.\n2. Klik 'Selanjutnya' -> pindah ke nomor 2.\n3. Klik nomor 7 pada palet grid kanan -> pindah ke nomor 7.",
+        testData: "currentIndex: 0 -> 1 -> 6.",
+        expected: "Perpindahan soal mulus, indikator soal aktif 'Soal X dari N' terupdate, dan ring focus biru mengelilingi nomor aktif di palet."
+    },
+    {
+        id: "TC-025",
+        module: "MODUL_5",
+        moduleName: "Navigasi & Lembar Soal",
+        severity: "CRITICAL",
+        scenario: "Autosave Jawaban Siswa secara Asynchronous (Livewire Real-Time)",
+        precondition: "Soal nomor 1 aktif, opsi belum dipilih.",
+        steps: "1. Klik salah satu opsi jawaban (misal pilihan B).\n2. Cek database tabel exam_history_answers.",
+        testData: "question_id = 10, answer_id = 45.",
+        expected: "Kartu opsi terpilih berubah warna menjadi biru dengan ikon centang. Record di database terisi selected_answer_id = 45 secara instan tanpa perlu reload."
+    },
+    {
+        id: "TC-026",
+        module: "MODUL_5",
+        moduleName: "Navigasi & Lembar Soal",
+        severity: "HIGH",
+        scenario: "Penggantian Jawaban pada Soal yang Sama",
+        precondition: "Siswa sebelumnya memilih opsi A.",
+        steps: "1. Klik opsi C pada soal yang sama.\n2. Cek database dan UI.",
+        testData: "Opsi lama = A, opsi baru = C.",
+        expected: "Highlight biru berpindah ke opsi C, record database ter-update dengan answer_id baru serta is_correct dan score_earned dihitung ulang."
+    },
+    {
+        id: "TC-027",
+        module: "MODUL_5",
+        moduleName: "Navigasi & Lembar Soal",
+        severity: "MEDIUM",
+        scenario: "Toggle Status Ragu-Ragu (is_doubtful)",
+        precondition: "Soal nomor 1 sedang aktif.",
+        steps: "1. Klik tombol 'Ragu-ragu'.\n2. Amati warna tombol dan nomor di palet navigasi.\n3. Klik tombol 'Batal Ragu-ragu'.",
+        testData: "is_doubtful = true -> false.",
+        expected: "Saat ragu-ragu: tombol berubah warna oranye, badge 'Ragu-ragu' muncul di header soal, nomor di palet jadi oranye. Saat dibatalkan: kembali ke status normal/hijau."
+    },
+    {
+        id: "TC-028",
+        module: "MODUL_5",
+        moduleName: "Navigasi & Lembar Soal",
+        severity: "LOW",
+        scenario: "Akurasi Status Warna pada Palet Navigasi Grid",
+        precondition: "Siswa telah menjawab soal 1, ragu-ragu pada soal 2, belum menjawab soal 3.",
+        steps: "1. Perhatikan warna pada grid navigasi soal kanan.",
+        testData: "Soal 1 = Jawaban terpilih; Soal 2 = Ragu; Soal 3 = Kosong.",
+        expected: "Nomor 1 berwarna hijau (emerald), Nomor 2 berwarna oranye (amber), Nomor 3 berwarna abu-abu (gray)."
+    },
+    {
+        id: "TC-029",
+        module: "MODUL_5",
+        moduleName: "Navigasi & Lembar Soal",
+        severity: "LOW",
+        scenario: "Kalkulasi Persentase Progress Bar Pengerjaan",
+        precondition: "Total 10 soal.",
+        steps: "1. Jawab 4 soal.\n2. Amati progress bar di header sticky.",
+        testData: "Answered = 4, Total = 10.",
+        expected: "Progress bar terisi 40% dan teks menunjukkan 'Progres pengerjaan: 40%'."
+    },
+
+    // --- MODUL 6: ANTI-CHEAT & DETEKSI PELANGGARAN ---
+    {
+        id: "TC-030",
+        module: "MODUL_6",
+        moduleName: "Anti-Cheat Pelanggaran",
+        severity: "HIGH",
+        scenario: "Deteksi Pindah Tab / Layar - Pelanggaran ke-1",
+        precondition: "Siswa sedang berada di lembar ujian, violation_count = 0.",
+        steps: "1. Buka tab baru di browser atau minimalkan jendela browser.\n2. Kembali lagi ke tab ujian.",
+        testData: "Event = visibilitychange (hidden) / window.blur.",
+        expected: "Sistem mendeteksi kecurangan, memunculkan modal merah 'PERINGATAN PELANGGARAN (1/3)', memberitahukan sisa toleransi 2 kali."
+    },
+    {
+        id: "TC-031",
+        module: "MODUL_6",
+        moduleName: "Anti-Cheat Pelanggaran",
+        severity: "HIGH",
+        scenario: "Deteksi Pindah Tab / Layar - Pelanggaran ke-2",
+        precondition: "Siswa telah melakukan 1 kali pelanggaran sebelumnya.",
+        steps: "1. Ulangi aksi berpindah tab setelah menutup modal peringatan pertama.\n2. Kembali ke tab ujian.",
+        testData: "violation_count = 2.",
+        expected: "Modal merah muncul kembali dengan judul 'PERINGATAN PELANGGARAN (2/3)' dan info sisa toleransi tinggal 1 kali."
+    },
+    {
+        id: "TC-032",
+        module: "MODUL_6",
+        moduleName: "Anti-Cheat Pelanggaran",
+        severity: "CRITICAL",
+        scenario: "Deteksi Pelanggaran ke-3 - Diskualifikasi & Selesai Paksa",
+        precondition: "Siswa telah mengantongi 2 kali pelanggaran.",
+        steps: "1. Lakukan perpindahan tab untuk ketiga kalinya.",
+        testData: "violation_count = 3.",
+        expected: "Server langsung memanggil submitExam(isTerminatedCheat: true), status ujian menjadi 'terminated_cheat', siswa didiskualifikasi dan dialihkan ke kartu hasil merah tidak lulus."
+    },
+    {
+        id: "TC-033",
+        module: "MODUL_6",
+        moduleName: "Anti-Cheat Pelanggaran",
+        severity: "HIGH",
+        scenario: "Uji Debounce Pelanggaran (Mencegah Double Counting)",
+        precondition: "Siswa berpindah tab di mana event 'blur' dan 'visibilitychange' menembak serentak.",
+        steps: "1. Pindah tab cepat dan amati penambahan violation_count di server.",
+        testData: "Interval blur < 2500ms.",
+        expected: "Hanya 1 pelanggaran yang dihitung (tidak terhitung ganda 2 kali untuk satu aksi keluar layar)."
+    },
+    {
+        id: "TC-034",
+        module: "MODUL_6",
+        moduleName: "Anti-Cheat Pelanggaran",
+        severity: "MEDIUM",
+        scenario: "Persistensi Rekam Pelanggaran di Database",
+        precondition: "Siswa mengalami 2 kali peringatan lalu me-refresh halaman.",
+        steps: "1. Tekan F5 (Refresh) saat ujian berlangsung.\n2. Cek nilai Alpine warningCount dan database.",
+        testData: "violation_count di DB = 2.",
+        expected: "Saat halaman dimuat kembali, count pelanggaran tetap 2 (tidak ter-reset ke 0)."
+    },
+
+    // --- MODUL 7: PENILAIAN & SUBMISI OTOMATIS ---
+    {
+        id: "TC-035",
+        module: "MODUL_7",
+        moduleName: "Penilaian & Submisi",
+        severity: "MEDIUM",
+        scenario: "Tampilan & Rekap Data Modal Konfirmasi Selesai Ujian",
+        precondition: "Ujian 10 soal, siswa menjawab 7 (2 di antaranya ragu-ragu), 3 kosong.",
+        steps: "1. Klik tombol 'Selesai Ujian'.\n2. Amati rincian data di dalam modal konfirmasi.",
+        testData: "Terjawab = 7, Ragu-ragu = 2, Kosong = 3.",
+        expected: "Modal menampilkan: Terjawab: 7, Ragu-ragu: 2, Kosong: 3 secara tepat beserta peringatan teks 'Masih ada soal kosong atau ragu-ragu'."
+    },
+    {
+        id: "TC-036",
+        module: "MODUL_7",
+        moduleName: "Penilaian & Submisi",
+        severity: "HIGH",
+        scenario: "Submisi Normal Sukses (Status Completed)",
+        precondition: "Siswa menekan tombol 'Ya, Selesaikan' pada modal konfirmasi.",
+        steps: "1. Klik 'Ya, Selesaikan'.\n2. Periksa perubahan record di database dan tampilan UI.",
+        testData: "Action submitExam().",
+        expected: "Record status berubah jadi 'completed', finished_at terisi waktu saat ini, duration_spent_seconds terhitung tepat, dan lembar soal berganti ke Tahap 3 (Hasil)."
+    },
+    {
+        id: "TC-037",
+        module: "MODUL_7",
+        moduleName: "Penilaian & Submisi",
+        severity: "CRITICAL",
+        scenario: "Akurasi Perhitungan Nilai Akhir Otoritatif Server",
+        precondition: "Total 10 soal (masing-masing bobot 1). 8 benar, 2 salah.",
+        steps: "1. Finalisasi ujian.\n2. Cek kolom score pada tabel exam_histories.",
+        testData: "Benar = 8, Total Max = 10, Formula: (8/10)*100.",
+        expected: "Kolom score di DB bernilai 80.00, correct_count = 8, wrong_count = 2, unanswered_count = 0."
+    },
+    {
+        id: "TC-038",
+        module: "MODUL_7",
+        moduleName: "Penilaian & Submisi",
+        severity: "HIGH",
+        scenario: "Evaluasi Ambang Batas Kelulusan (KKM / Threshold)",
+        precondition: "KKM ujian disetel 75.00.",
+        steps: "1. Uji kondisi siswa mendapat skor 75.00 atau 80.00.\n2. Uji kondisi siswa mendapat skor 74.99 atau 60.00.",
+        testData: "Threshold = 75.00.",
+        expected: "Skor >= 75.00: is_passed = true (Banner hijau 'SELAMAT, ANDA LULUS!'). Skor < 75.00: is_passed = false (Banner merah 'MOHON MAAF, ANDA BELUM LULUS')."
+    },
+    {
+        id: "TC-039",
+        module: "MODUL_7",
+        moduleName: "Penilaian & Submisi",
+        severity: "HIGH",
+        scenario: "Penilaian Butir Soal Berstatus Ragu-Ragu",
+        precondition: "Siswa menjawab benar pada butir soal nomor 5, namun lupa melepas tanda ragu-ragu.",
+        steps: "1. Selesaikan ujian.\n2. Cek apakah jawaban soal nomor 5 tetap diberi poin skor.",
+        testData: "selected_answer_id is correct, is_doubtful = true.",
+        expected: "Jawaban tetap dihitung benar dan poin skor masuk ke nilai akhir (standar CBT nasional tidak menganulir jawaban ragu-ragu)."
+    },
+    {
+        id: "TC-040",
+        module: "MODUL_7",
+        moduleName: "Penilaian & Submisi",
+        severity: "CRITICAL",
+        scenario: "Pencegahan Mengubah Jawaban setelah Finalisasi",
+        precondition: "Sesi ujian telah berstatus completed atau timeout.",
+        steps: "1. Coba kirim request Livewire saveAnswer() untuk sesi yang sudah selesai.",
+        testData: "historyId = sesi selesai.",
+        expected: "Method saveAnswer langsung melakukan early return karena if ($this->isFinished) dan status DB bukan 'in_progress'. Data jawaban terkunci paten."
+    },
+
+    // --- MODUL 8: HASIL & RIWAYAT SISWA ---
+    {
+        id: "TC-041",
+        module: "MODUL_8",
+        moduleName: "Hasil & Riwayat Siswa",
+        severity: "MEDIUM",
+        scenario: "Kelengkapan Informasi pada Halaman Hasil Pengerjaan (Tahap 3)",
+        precondition: "Siswa baru saja menyelesaikan pengerjaan mapel.",
+        steps: "1. Periksa komponen hasil pengerjaan pada layar.",
+        testData: "Result data.",
+        expected: "Menampilkan kartu skor besar, status kelulusan, total soal, butir benar, butir salah, butir kosong, waktu mulai, waktu selesai, dan durasi pengerjaan (HH:MM:SS)."
+    },
+    {
+        id: "TC-042",
+        module: "MODUL_8",
+        moduleName: "Hasil & Riwayat Siswa",
+        severity: "MEDIUM",
+        scenario: "Navigasi 'Kerjakan Mapel Lain' dari Halaman Hasil",
+        precondition: "Ujian masih memiliki mapel lain yang belum dikerjakan.",
+        steps: "1. Klik tombol 'Kerjakan Mapel Lain'.\n2. Amati tampilan yang muncul.",
+        testData: "Action backToSubjects().",
+        expected: "Siswa dikembalikan ke Tahap 1 (Pilih Mapel). Mapel yang baru selesai kini berstatus 'Sudah Selesai', mapel lain dapat dipilih."
+    },
+    {
+        id: "TC-043",
+        module: "MODUL_8",
+        moduleName: "Hasil & Riwayat Siswa",
+        severity: "HIGH",
+        scenario: "Penyaringan Data di Tabel Riwayat Ujian Siswa (ExamHistoryResource)",
+        precondition: "Siswa memiliki 1 sesi selesai dan 1 sesi sedang berlangsung (in_progress).",
+        steps: "1. Buka menu 'Riwayat Ujian' (/ujian/exam-histories).\n2. Cek baris tabel yang tampil.",
+        testData: "Filter: status != 'in_progress'.",
+        expected: "Hanya ujian yang sudah selesai/timeout/pelanggaran yang muncul. Sesi yang masih 'in_progress' tidak ditampilkan di menu riwayat."
+    },
+    {
+        id: "TC-044",
+        module: "MODUL_8",
+        moduleName: "Hasil & Riwayat Siswa",
+        severity: "HIGH",
+        scenario: "Fungsi Tombol 'Lihat Hasil' pada Riwayat Ujian (Deep-link)",
+        precondition: "Siswa berada di menu Riwayat Ujian.",
+        steps: "1. Klik tombol 'Lihat Hasil' pada salah satu baris riwayat.\n2. Amati halaman yang terbuka.",
+        testData: "URL = /ujian/exams/{exam_id}/mulai?subject={subject_id}.",
+        expected: "Halaman StartingExam terbuka langsung pada Tahap 3 (Hasil Evaluasi Mapel) tanpa memicu error atau mengulang ujian."
+    },
+
+    // --- MODUL 9: MONITORING NILAI GURU / ADMIN ---
+    {
+        id: "TC-045",
+        module: "MODUL_9",
+        moduleName: "Monitoring Admin",
+        severity: "HIGH",
+        scenario: "Tampilan Rekap Nilai Siswa di Admin Panel (ExamScoreResource)",
+        precondition: "Admin membuka menu Monitoring > Nilai Ujian (/admin/exam-scores).",
+        steps: "1. Periksa kolom-kolom tabel nilai ujian.",
+        testData: "Columns: NIS, Nama Siswa, Ujian, Mapel, Nilai, KKM, Kelulusan, Pelanggaran, Keterangan, Waktu Selesai.",
+        expected: "Seluruh data siswa dan hasil pengerjaan mapel tertampil lengkap dengan badge warna status yang sesuai (Selesai, Waktu Habis, Pelanggaran, Dikerjakan)."
+    },
+    {
+        id: "TC-046",
+        module: "MODUL_9",
+        moduleName: "Monitoring Admin",
+        severity: "MEDIUM",
+        scenario: "Filter Tabel Nilai Berdasarkan Ujian, Mapel, Kelulusan & Status",
+        precondition: "Terdapat banyak data riwayat dari berbagai ujian dan status.",
+        steps: "1. Pilih filter Ujian tertentu.\n2. Pilih filter Kelulusan = 'Lulus'.\n3. Pilih filter Keterangan = 'Pelanggaran'.",
+        testData: "Filters applied.",
+        expected: "Tabel menyaring baris data secara akurat sesuai kriteria filter yang dipilih oleh admin/guru."
+    },
+    {
+        id: "TC-047",
+        module: "MODUL_9",
+        moduleName: "Monitoring Admin",
+        severity: "MEDIUM",
+        scenario: "Infolist Detail Nilai Ujian Siswa (View Action Infolist)",
+        precondition: "Admin mengklik ikon mata / View Action pada salah satu baris nilai.",
+        steps: "1. Klik tombol View.\n2. Periksa modal/halaman rincian Infolist.",
+        testData: "Record ID = target history.",
+        expected: "Infolist menampilkan detail lengkap: NIS, Nama, Mapel, KKM, Nilai, Status Kelulusan, Rincian Benar/Salah/Kosong, Jumlah Pelanggaran Tab, dan Durasi Pengerjaan."
+    },
+
+    // --- MODUL 10: KEAMANAN & EDGE CASES ---
+    {
+        id: "TC-048",
+        module: "MODUL_10",
+        moduleName: "Keamanan & Edge Cases",
+        severity: "CRITICAL",
+        scenario: "Pengujian Parameter Tampering pada Livewire saveAnswer()",
+        precondition: "Siswa sedang mengerjakan Mapel Matematika.",
+        steps: "1. Buka Browser DevTools (Network / Console).\n2. Coba kirim payload Livewire saveAnswer dengan question_id milik Mapel IPA atau answer_id dari soal lain.",
+        testData: "question_id = luar sesi aktif, answer_id = opsi kunci jawaban dari soal lain.",
+        expected: "Sistem WAJIB memvalidasi integritas relasi. Jawaban tidak boleh disematkan jika soal atau opsi bukan bagian dari sesi mapel aktif siswa tersebut."
+    },
+    {
+        id: "TC-049",
+        module: "MODUL_10",
+        moduleName: "Keamanan & Edge Cases",
+        severity: "HIGH",
+        scenario: "Pencegahan Berpindah Mapel saat Sesi Masih Berjalan (backToSubjects Block)",
+        precondition: "Siswa sedang berada di tengah-tengah pengerjaan Mapel Matematika.",
+        steps: "1. Coba klik tombol kembali 'Semua Mapel' atau panggil method backToSubjects().",
+        testData: "status = 'in_progress'.",
+        expected: "Sistem menolak keluar dan menampilkan notifikasi warning: 'Sesi ujian sedang berjalan. Selesaikan atau biarkan waktu habis sebelum berpindah mapel'."
+    },
+    {
+        id: "TC-050",
+        module: "MODUL_10",
+        moduleName: "Keamanan & Edge Cases",
+        severity: "HIGH",
+        scenario: "Penanganan Kasus Mapel Tanpa Soal Aktif di Database (Empty Questions)",
+        precondition: "Admin memasukkan mapel ke ujian dengan qty = 10, namun di database questions hanya ada 0 butir soal aktif.",
+        steps: "1. Siswa memilih mapel tersebut.\n2. Amati perilaku sistem saat inisialisasi sesi dan kalkulasi nilai.",
+        testData: "active questions count = 0.",
+        expected: "Sistem tidak mengalami error fatal/divide-by-zero (finalize score terlindungi totalMaxScore > 0). Idealnya ada notifikasi 'Soal belum tersedia untuk mapel ini'."
+    }
+];
+
+// Storage keys
+const STORAGE_KEY = 'cbt_blackbox_test_results_v1';
+const THEME_KEY = 'cbt_theme_mode';
+
+// Theme Management
+function initTheme() {
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+    applyTheme(isDark);
+}
+
+function applyTheme(isDark) {
+    if (isDark) {
+        document.body.classList.add('dark-mode');
+        document.documentElement.classList.add('dark-mode');
+    } else {
+        document.body.classList.remove('dark-mode');
+        document.documentElement.classList.remove('dark-mode');
+    }
+    updateThemeButtons(isDark);
+}
+
+function updateThemeButtons(isDark) {
+    const icon = isDark ? '☀️' : '🌙';
+    const text = isDark ? 'Mode Terang' : 'Mode Gelap';
+
+    const headerIcon = document.getElementById('themeToggleIcon');
+    const headerText = document.getElementById('themeToggleText');
+    if (headerIcon && headerText) {
+        headerIcon.innerText = icon;
+        headerText.innerText = text;
+    }
+
+    const tbIcon = document.getElementById('toolbarThemeIcon');
+    const tbText = document.getElementById('toolbarThemeText');
+    if (tbIcon && tbText) {
+        tbIcon.innerText = icon;
+        tbText.innerText = text;
+    }
+}
+
+function toggleDarkMode() {
+    const isCurrentlyDark = document.body.classList.contains('dark-mode');
+    const newTheme = !isCurrentlyDark;
+    applyTheme(newTheme);
+    localStorage.setItem(THEME_KEY, newTheme ? 'dark' : 'light');
+}
+
+// State management
+let testResults = {};
+
+function initApp() {
+    initTheme();
+
+    // Load from localStorage if exists
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+        try {
+            testResults = JSON.parse(saved);
+        } catch (e) {
+            testResults = {};
+        }
+    }
+
+    renderTable();
+    updateStats();
+}
+
+function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const modFilter = document.getElementById('moduleFilter').value;
+    const statFilter = document.getElementById('statusFilter').value;
+
+    testCases.forEach(tc => {
+        // Status & Notes
+        const currentData = testResults[tc.id] || { status: 'pending', notes: '' };
+
+        // Filtering
+        if (modFilter !== 'ALL' && tc.module !== modFilter) return;
+        if (statFilter !== 'ALL' && currentData.status !== statFilter) return;
+
+        if (search) {
+            const matchSearch = 
+                tc.id.toLowerCase().includes(search) ||
+                tc.scenario.toLowerCase().includes(search) ||
+                tc.steps.toLowerCase().includes(search) ||
+                tc.expected.toLowerCase().includes(search) ||
+                tc.moduleName.toLowerCase().includes(search);
+            if (!matchSearch) return;
+        }
+
+        // Severity badge class
+        let sevClass = 'badge-med';
+        if (tc.severity === 'CRITICAL') sevClass = 'badge-crit';
+        if (tc.severity === 'HIGH') sevClass = 'badge-high';
+        if (tc.severity === 'LOW') sevClass = 'badge-low';
+
+        // Status select class
+        let selectClass = 'status-pending';
+        if (currentData.status === 'sesuai') selectClass = 'status-sesuai';
+        if (currentData.status === 'tidak') selectClass = 'status-tidak';
+
+        const tr = document.createElement('tr');
+        tr.id = `row-${tc.id}`;
+        tr.innerHTML = `
+            <td>
+                <span class="tc-id">${tc.id}</span><br>
+                <span class="tc-module">${tc.moduleName}</span><br>
+                <span class="badge-pill ${sevClass}">${tc.severity}</span>
+            </td>
+            <td>
+                <div class="tc-scenario">${tc.scenario}</div>
+                <div style="font-size: 11.5px; color: var(--gray-600);">
+                    <strong>Pre-kondisi:</strong> ${tc.precondition}
+                </div>
+            </td>
+            <td>
+                <div class="tc-steps">
+                    <strong>Langkah Uji:</strong>
+                    <div style="white-space: pre-line; margin-top: 2px;">${tc.steps}</div>
+                </div>
+                <div class="tc-data"><strong>Data:</strong> ${tc.testData}</div>
+            </td>
+            <td>
+                <div class="tc-expected">${tc.expected}</div>
+            </td>
+            <td>
+                <select class="select-status ${selectClass}" id="sel-${tc.id}" onchange="updateCaseStatus('${tc.id}', this.value)">
+                    <option value="pending" ${currentData.status === 'pending' ? 'selected' : ''}>⏳ Belum Diuji</option>
+                    <option value="sesuai" ${currentData.status === 'sesuai' ? 'selected' : ''}>✅ Sesuai</option>
+                    <option value="tidak" ${currentData.status === 'tidak' ? 'selected' : ''}>❌ Tidak Sesuai</option>
+                </select>
+            </td>
+            <td>
+                <textarea class="notes-textarea" id="notes-${tc.id}" placeholder="Tuliskan catatan, bukti, atau bug..." onchange="updateCaseNotes('${tc.id}', this.value)">${currentData.notes || ''}</textarea>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function updateCaseStatus(id, newStatus) {
+    if (!testResults[id]) {
+        testResults[id] = { status: newStatus, notes: '' };
+    } else {
+        testResults[id].status = newStatus;
+    }
+    saveToStorage();
+
+    // Update select element color class
+    const sel = document.getElementById(`sel-${id}`);
+    if (sel) {
+        sel.className = `select-status status-${newStatus}`;
+    }
+
+    updateStats();
+}
+
+function updateCaseNotes(id, newNotes) {
+    if (!testResults[id]) {
+        testResults[id] = { status: 'pending', notes: newNotes };
+    } else {
+        testResults[id].notes = newNotes;
+    }
+    saveToStorage();
+}
+
+function saveToStorage() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(testResults));
+}
+
+function updateStats() {
+    let sesuai = 0;
+    let tidak = 0;
+    let pending = 0;
+    const total = testCases.length;
+
+    testCases.forEach(tc => {
+        const item = testResults[tc.id];
+        if (!item || item.status === 'pending') {
+            pending++;
+        } else if (item.status === 'sesuai') {
+            sesuai++;
+        } else if (item.status === 'tidak') {
+            tidak++;
+        }
+    });
+
+    const evaluated = sesuai + tidak;
+    const passPct = total > 0 ? Math.round((sesuai / total) * 100) : 0;
+    const failPct = total > 0 ? Math.round((tidak / total) * 100) : 0;
+    const pendPct = total > 0 ? Math.round((pending / total) * 100) : 0;
+
+    document.getElementById('stat-total').innerText = total;
+    document.getElementById('stat-sesuai').innerText = sesuai;
+    document.getElementById('stat-sesuai-pct').innerText = `${passPct}% dari total`;
+
+    document.getElementById('stat-tidak').innerText = tidak;
+    document.getElementById('stat-tidak-pct').innerText = `${failPct}% dari total`;
+
+    document.getElementById('stat-pending').innerText = pending;
+    document.getElementById('stat-pending-pct').innerText = `${pendPct}% tersisa`;
+
+    // Progress bar
+    const barPass = document.getElementById('bar-pass');
+    const barFail = document.getElementById('bar-fail');
+    const progText = document.getElementById('progress-text');
+
+    barPass.style.width = `${passPct}%`;
+    barFail.style.width = `${failPct}%`;
+    progText.innerText = `${evaluated} / ${total} Selesai Diuji (${Math.round((evaluated / total) * 100)}%)`;
+}
+
+function filterTable() {
+    renderTable();
+}
+
+function markAllPass() {
+    if (!confirm('Tandai semua 50 skenario pengujian sebagai "Sesuai"?')) return;
+
+    testCases.forEach(tc => {
+        if (!testResults[tc.id]) {
+            testResults[tc.id] = { status: 'sesuai', notes: '' };
+        } else {
+            testResults[tc.id].status = 'sesuai';
+        }
+    });
+
+    saveToStorage();
+    renderTable();
+    updateStats();
+}
+
+function resetAll() {
+    if (!confirm('Apakah Anda yakin ingin mereset seluruh data hasil pengujian dan catatan kembali ke Belum Diuji?')) return;
+
+    testResults = {};
+    saveToStorage();
+    renderTable();
+    updateStats();
+}
+
+function exportData() {
+    const exportPayload = {
+        app: 'CBT App Blackbox Testing',
+        timestamp: new Date().toISOString(),
+        total_cases: testCases.length,
+        results: testResults
+    };
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `cbt_test_report_${new Date().toISOString().slice(0,10)}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+}
+
+// Start
+window.addEventListener('DOMContentLoaded', initApp);
+</script>
+
+</body>
+</html>

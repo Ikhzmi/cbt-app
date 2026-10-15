@@ -30,6 +30,12 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    // Relasi ke data siswa
+    public function student(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Student::class);
+    }
+
     // Autorisasi user agar dapat login ke Filament Panel
     public function canAccessPanel(Panel $panel): bool
     {

@@ -19,8 +19,8 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'Khairi Ibnutama',
-            'email' => 'mr.ibnutama@gmail.com',
+            'name' => 'M. Ikhsan Azmi',
+            'email' => 'm.ikhsanazmi123@gmail.com',
             'username' => 'developer',
             'is_staff' => true,
             // use Illuminate\Support\Facades\Hash; <-- import di atas
